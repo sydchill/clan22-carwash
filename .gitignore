@@ -1,0 +1,10 @@
+node_modules
+dist
+.DS_Store
+
+# Local configuration. .env holds the live phone number and Web3Forms key;
+# .env.example is the committed template.
+.env
+.env.*
+!.env.example
+*.local

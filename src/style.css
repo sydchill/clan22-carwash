@@ -1,0 +1,276 @@
+/* Design tokens lifted from the Clan22 Carwash design canvas. */
+:root {
+  --c22-bg: #f4f8f8;
+  --c22-surface: #ffffff;
+  --c22-tint: #e3f0f1;
+  --c22-tint-warm: #e3eeef;
+
+  --c22-ink: #0e2a32;
+  --c22-deep: #0b3a45;
+
+  /* Three teals, split by what they are allowed to carry:
+     --c22-teal      brand accent — large display text and decorative fills only
+                     (3.8:1 on white: fine at 24px+, not for body copy)
+     --c22-teal-cta  behind white button text (5.0:1)
+     --c22-teal-dark small text on light surfaces (6.8:1) */
+  --c22-teal: #2e8e9c;
+  --c22-teal-cta: #237a87;
+  --c22-teal-dark: #14646f;
+  --c22-teal-light: #6fc2cc;
+
+  --c22-muted: #56757b;
+  --c22-faint: #5b777d;
+
+  --c22-border: #d7e5e7;
+  --c22-border-strong: #b3cace;
+  --c22-danger: #b42318;
+  --c22-danger-bg: #fdf2f0;
+  --c22-success: #12715c;
+  --c22-focus: #14646f;
+  /* Dark panels redefine --c22-focus to this so the ring stays visible. */
+  --c22-focus-on-dark: #9fe0e8;
+
+  --c22-on-deep: rgba(255, 255, 255, 0.72);
+  --c22-on-deep-soft: rgba(255, 255, 255, 0.55);
+  --c22-deep-panel: rgba(255, 255, 255, 0.06);
+
+  --c22-radius-card: 18px;
+  --c22-radius-panel: 20px;
+  --c22-radius-control: 10px;
+
+  --c22-shadow-flat: 0 1px 3px rgba(11, 58, 69, 0.08);
+  --c22-shadow-lift: 0 12px 34px rgba(11, 58, 69, 0.14);
+  --c22-shadow-hero: 0 24px 60px rgba(11, 58, 69, 0.12);
+  --c22-shadow-float: 0 12px 30px rgba(11, 58, 69, 0.28);
+
+  --c22-gutter: 6vw;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--c22-bg);
+  color: var(--c22-ink);
+  font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+a {
+  color: var(--c22-teal);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--c22-deep);
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* Shared section furniture ------------------------------------------------ */
+
+.c22-section {
+  padding-inline: var(--c22-gutter);
+}
+
+.c22-eyebrow {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c22-teal-dark);
+}
+
+.c22-heading {
+  font-size: clamp(28px, 3.4vw, 42px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  margin-top: 14px;
+}
+
+.c22-lede {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--c22-muted);
+  margin-top: 14px;
+}
+
+.c22-body {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--c22-muted);
+  text-wrap: pretty;
+}
+
+.c22-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 15px 24px;
+  border-radius: var(--c22-radius-control);
+  font-weight: 500;
+  font-size: 16px;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.c22-button--primary {
+  background: var(--c22-teal-cta);
+  color: #ffffff;
+}
+
+.c22-button--primary:hover {
+  background: var(--c22-deep);
+  color: #ffffff;
+}
+
+.c22-button--quiet {
+  background: var(--c22-surface);
+  color: var(--c22-ink);
+  box-shadow: var(--c22-shadow-flat);
+}
+
+.c22-button--quiet:hover {
+  color: var(--c22-deep);
+}
+
+/* On the dark contact panel the primary button inverts on hover. */
+.c22-button--on-deep:hover {
+  background: #ffffff;
+  color: var(--c22-deep);
+}
+
+.c22-grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Form controls ----------------------------------------------------------- */
+
+/* 16px minimum stops iOS Safari zooming the page when a field is focused. */
+.c22-input,
+.c22-select,
+.c22-textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--c22-border);
+  border-radius: 11px;
+  background: var(--c22-surface);
+  color: var(--c22-ink);
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.4;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.c22-textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.c22-select {
+  appearance: none;
+  padding-right: 42px;
+  /* Chevron drawn as a data URI so the control stays self-contained. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9' fill='none' stroke='%235A7A80' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5 7 7.5l6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  cursor: pointer;
+}
+
+.c22-input::placeholder,
+.c22-textarea::placeholder {
+  color: var(--c22-faint);
+}
+
+.c22-input:hover,
+.c22-select:hover,
+.c22-textarea:hover {
+  border-color: var(--c22-border-strong);
+}
+
+.c22-input:focus-visible,
+.c22-select:focus-visible,
+.c22-textarea:focus-visible {
+  outline: none;
+  border-color: var(--c22-teal);
+  box-shadow: 0 0 0 3px rgba(46, 142, 156, 0.28);
+}
+
+.c22-input[aria-invalid='true'],
+.c22-select[aria-invalid='true'],
+.c22-textarea[aria-invalid='true'] {
+  border-color: var(--c22-danger);
+  background: var(--c22-danger-bg);
+}
+
+.c22-input[aria-invalid='true']:focus-visible,
+.c22-select[aria-invalid='true']:focus-visible,
+.c22-textarea[aria-invalid='true']:focus-visible {
+  box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.24);
+}
+
+/* A consistent, always-visible keyboard ring across the whole page. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--c22-focus);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.c22-button {
+  border: none;
+  cursor: pointer;
+  min-height: 48px;
+  justify-content: center;
+  text-align: center;
+}
+
+.c22-button[disabled],
+.c22-button[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Available to screen readers, invisible on screen. */
+.c22-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
