@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import BrandMark from './BrandMark.vue'
+import BrandWordmark from './BrandWordmark.vue'
 import { displayPhone, waLink } from '../lib/contact'
 </script>
 
 <template>
   <footer class="footer c22-section">
     <div class="brand">
-      <BrandMark :size="22" />
-      Clan22 Carwash
+      <BrandWordmark :height="32" />
     </div>
     <span>Hand car wash at your home · Midrand</span>
     <a :href="waLink" target="_blank" rel="noopener">{{ displayPhone }}</a>
@@ -31,8 +30,5 @@ import { displayPhone, waLink } from '../lib/contact'
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  color: var(--c22-ink);
-  font-weight: 700;
 }
 </style>

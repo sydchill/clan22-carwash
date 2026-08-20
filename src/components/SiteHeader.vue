@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import BrandMark from './BrandMark.vue'
+import BrandWordmark from './BrandWordmark.vue'
 import { navLinks } from '../content'
 </script>
 
 <template>
   <header class="header">
     <a class="brand" href="#top">
-      <BrandMark :size="26" />
-      <span class="brand-name">Clan22 Carwash</span>
+      <BrandWordmark :height="38" />
     </a>
     <nav class="nav">
       <a v-for="link in navLinks" :key="link.href" class="nav-link" :href="link.href">
@@ -35,19 +34,7 @@ import { navLinks } from '../content'
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  color: var(--c22-ink);
-}
-
-.brand:hover {
-  color: var(--c22-ink);
-}
-
-.brand-name {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
+  min-width: 0;
 }
 
 .nav {
@@ -89,9 +76,10 @@ import { navLinks } from '../content'
   }
 }
 
-@media (max-width: 420px) {
-  .brand-name {
-    font-size: 17px;
+@media (max-width: 480px) {
+  .brand :deep(img),
+  .brand :deep(.fallback) {
+    height: 30px;
   }
 
   .nav-cta {

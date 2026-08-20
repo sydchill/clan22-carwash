@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import BrandWordmark from './BrandWordmark.vue'
 import { steps } from '../content'
 </script>
 
 <template>
   <section id="how" class="c22-section how">
+    <BrandWordmark class="band-logo" :height="34" variant="light" />
     <div class="eyebrow">How it works</div>
     <h2 class="title">Three taps and your car<br />is clean by this afternoon.</h2>
 
@@ -26,6 +28,11 @@ import { steps } from '../content'
   background: var(--c22-deep);
   color: #ffffff;
   padding-block: 84px;
+}
+
+.band-logo {
+  margin-bottom: 22px;
+  opacity: 0.9;
 }
 
 .eyebrow {

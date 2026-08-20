@@ -34,6 +34,14 @@ export const siteConfig = {
    * customer sending the booking from their own WhatsApp.
    */
   web3formsAccessKey: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY?.trim() ?? '',
+  /**
+   * hCaptcha site key. Web3Forms' free tier uses their shared key; paid plans
+   * can register their own. Empty disables the check entirely.
+   *
+   * Client-side this only gates the button — Web3Forms must also have hCaptcha
+   * switched on in its dashboard for the token to actually be verified.
+   */
+  hcaptchaSitekey: import.meta.env.VITE_HCAPTCHA_SITEKEY?.trim() ?? '',
   /** Show the add-on chips under the services grid. */
   showAddOns: true,
   /** Show the sticky "Book a wash" pill in the bottom-right corner. */
@@ -44,3 +52,6 @@ export const siteConfig = {
 
 /** Whether bookings can be emailed, or must fall back to the WhatsApp handoff. */
 export const emailDeliveryEnabled = siteConfig.web3formsAccessKey.length > 0
+
+/** The captcha only applies to the email path; the WhatsApp handoff has no server. */
+export const captchaEnabled = emailDeliveryEnabled && siteConfig.hcaptchaSitekey.length > 0

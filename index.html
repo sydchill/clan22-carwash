@@ -9,12 +9,25 @@
       content="Book a hand car wash at your house in Midrand. Pick your wash, your car and a time — from R120, usually same day. The booking goes straight to WhatsApp."
     />
     <meta name="theme-color" content="#0B3A45" />
-    <!-- The mark is set in DM Sans, so the icons are rasterised from the real
-         font ahead of time: nothing outside the page ever loads a webfont. -->
+    <!-- All generated from public/logo-mark.png — see the README. -->
     <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
     <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Share card. og:image wants an absolute URL in production; relative
+         works for most crawlers and avoids hardcoding a domain we do not have
+         yet. Swap in the full https:// URL once the site is deployed. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Clan22 Carwash — Book a hand car wash in Midrand" />
+    <meta
+      property="og:description"
+      content="Pick your wash, your car and a time. From R120, usually same day."
+    />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

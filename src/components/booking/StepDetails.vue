@@ -1,8 +1,29 @@
 <script setup lang="ts">
 import FormField from '../ui/FormField.vue'
+import CaptchaField from './CaptchaField.vue'
 import { useBookingForm } from '../../composables/useBookingForm'
 
-const { form, suburbs, visibleError, markTouched } = useBookingForm()
+const {
+  form,
+  suburbs,
+  visibleError,
+  markTouched,
+  captchaEnabled,
+  captchaToken,
+  captchaResetSignal,
+  captchaUnavailable,
+} = useBookingForm()
+
+function onToken(token: string): void {
+  captchaToken.value = token
+  if (token) markTouched('captcha')
+}
+
+function onUnavailable(): void {
+  // Fail open in the form: the send button stops being blocked, and the
+  // component explains what happened and points at the WhatsApp fallback.
+  captchaUnavailable.value = true
+}
 </script>
 
 <template>
@@ -105,6 +126,14 @@ const { form, suburbs, visibleError, markTouched } = useBookingForm()
         ></textarea>
       </template>
     </FormField>
+
+    <CaptchaField
+      v-if="captchaEnabled"
+      :error="visibleError('captcha')"
+      :reset-signal="captchaResetSignal"
+      @token="onToken"
+      @unavailable="onUnavailable"
+    />
   </div>
 </template>
 

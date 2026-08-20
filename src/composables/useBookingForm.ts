@@ -8,7 +8,7 @@ import {
   vehicleTypes,
   OTHER_AREA,
 } from '../content'
-import { emailDeliveryEnabled, siteConfig } from '../site.config'
+import { captchaEnabled, emailDeliveryEnabled, siteConfig } from '../site.config'
 import { buildQuote } from '../lib/quote'
 import { composeBookingMessage } from '../lib/message'
 import { buildConfirmationLink, composeConfirmationMessage } from '../lib/confirmation'
@@ -79,6 +79,12 @@ const restoredDraft = ref(false)
 const submitError = ref<string | null>(null)
 /** Honeypot. Bound to a hidden field; anything but empty means a bot filled it. */
 const honeypot = ref('')
+/** hCaptcha token. Single use, and it expires a couple of minutes after solving. */
+const captchaToken = ref('')
+/** Bumped to ask the widget for a fresh challenge. */
+const captchaResetSignal = ref(0)
+/** Set when the hCaptcha script cannot load at all. */
+const captchaUnavailable = ref(false)
 
 // ---------------------------------------------------------------- derived ---
 
@@ -178,6 +184,10 @@ const errors = computed<Record<string, string>>(() => {
   if (!form.suburb) found.suburb = 'Choose the area you are in.'
   if (form.street.trim().length < 4) found.street = 'Street and number, so I can find the gate.'
 
+  if (captchaEnabled && !captchaUnavailable.value && !captchaToken.value) {
+    found.captcha = 'Tick the box to show you are not a robot.'
+  }
+
   return found
 })
 
@@ -185,7 +195,7 @@ const stepFields: Record<StepId, string[]> = {
   service: ['serviceId'],
   vehicle: ['vehicleId'],
   when: ['dateKey', 'time'],
-  details: ['name', 'phone', 'suburb', 'street'],
+  details: ['name', 'phone', 'suburb', 'street', 'captcha'],
 }
 
 function stepErrors(id: StepId): string[] {
@@ -272,6 +282,8 @@ function reset(): void {
   restoredDraft.value = false
   submitError.value = null
   honeypot.value = ''
+  captchaToken.value = ''
+  captchaResetSignal.value += 1
   clearDraft()
 }
 
@@ -346,8 +358,14 @@ async function submit(): Promise<boolean> {
     area: form.suburb,
     message: buildNotificationBody(),
     botcheck: '',
+    ...(captchaToken.value ? { 'h-captcha-response': captchaToken.value } : {}),
   })
   sending.value = false
+
+  // The token is spent either way: Web3Forms consumes it on success, and on
+  // failure we cannot tell whether it was consumed. Always take a fresh one.
+  captchaToken.value = ''
+  captchaResetSignal.value += 1
 
   if (!result.ok) {
     // Keep the draft: the customer must not have to retype anything.
@@ -450,6 +468,10 @@ export function useBookingForm() {
     submitError,
     honeypot,
     emailDeliveryEnabled,
+    captchaEnabled,
+    captchaToken,
+    captchaResetSignal,
+    captchaUnavailable,
 
     services: bookableServices,
     addOns: allAddOns,

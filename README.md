@@ -88,9 +88,43 @@ form stays exactly as it was — **the draft is deliberately not cleared** — a
 error panel offers *Try again* and *Send on WhatsApp instead*, so a bad connection
 can never swallow a booking.
 
-A honeypot field (`#booking-company`, hidden via `.c22-visually-hidden`, with
-`tabindex="-1"` and `aria-hidden`) catches bots. If it is filled, the form shows
-the normal success panel but sends nothing, so the bot learns nothing.
+### Spam protection
+
+Two layers, and they catch different things:
+
+**Honeypot** — `#booking-company`, hidden via `.c22-visually-hidden` with
+`tabindex="-1"` and `aria-hidden`. If it is filled, the form shows the normal
+success panel but sends nothing, so the bot learns nothing. Costs a real
+customer nothing.
+
+**hCaptcha** on the last step, via Web3Forms' native support. The token is sent
+as `h-captcha-response`.
+
+Set `VITE_HCAPTCHA_SITEKEY` in `.env` — Web3Forms' free tier uses their shared
+key, `50b2fe65-b00b-4b9e-ad62-3ba471098be2`. Empty disables the check.
+
+**It must also be switched on in the Web3Forms dashboard.** Without that,
+Web3Forms never verifies the token and the widget is decoration — the client
+side only gates the button, which a script can skip entirely.
+
+Implementation notes:
+
+- The hCaptcha script loads only when `CaptchaField` mounts, i.e. when someone
+  actually reaches step 4. Most visitors never fetch it.
+- Tokens are single use and expire a couple of minutes after solving. The
+  widget is reset after every submit attempt, and the token is cleared on the
+  expiry and error callbacks.
+- `hcaptcha.remove()` runs on unmount, otherwise revisiting the step leaks an
+  iframe each time.
+- If the script cannot load (ad blocker, dropped connection) the form **fails
+  open**: the button unblocks and the field explains what happened, pointing at
+  the WhatsApp fallback. Blocking a paying customer over a blocked third-party
+  script is the worse failure. Note this only holds while the Web3Forms
+  dashboard toggle is off; with it on, such a submission is rejected server-side
+  and the customer lands on the retry panel.
+- hCaptcha renders at a fixed 303×78 and cannot be told to shrink, so it is
+  scaled to 0.88 below 480px and 0.78 below 360px. Unscaled it runs past the
+  card padding to the screen edge on a small phone.
 
 ### Privacy note
 
@@ -216,41 +250,55 @@ edits if they change:
 `HOURS` in `src/lib/schedule.ts`, keyed by JS weekday (0 = Sunday). The contact
 panel's published hours are separate copy in `src/content.ts` — update both.
 
-## Brand mark and icons
+## Brand assets
 
-The mark is "22" on a navy tile, set in DM Sans.
+The logo is supplied artwork, not drawn in code. Source files came from the
+`Clan22 carwash website/brand` export; what ships lives in `public/`:
 
-`BrandMark.vue` is real text, so changing it is a one-word edit. Both the glyph
-size and the corner radius are derived from the `size` prop (0.46 and 0.27 of
-the box), so the 22px footer mark stays in proportion with the 26px header one
-— the old version hardcoded 12px and 7px regardless of size.
+| File | What it is |
+|---|---|
+| `logo-wordmark.png` | "Clan22 CARWASH" lockup for light surfaces, 1153×187 |
+| `logo-wordmark-light.png` | The reversed colourway — white "Clan" and "CARWASH" — for navy panels |
+| `logo-mark.png` | The square C22 icon, 512×512 |
+| `og-image.png` | Social share card, 1200×630 |
 
-**The favicons do not use that component, and must not.** Nothing outside the
-page loads DM Sans: a `<text>` element in an SVG favicon renders in whatever
-fallback font the browser has, with different metrics from the ones the layout
-was tuned for. That was the original bug. The icons are therefore rasterised
-from the real font ahead of time, so the shapes are baked in and no font is
-needed at display time. This is also why there is no SVG favicon.
+Both wordmarks were exported on an 1800×440 canvas with the artwork in the
+top-left. They are cropped to their alpha bounding box before use, otherwise
+the padding becomes dead space in the header. `scratchpad/pngcrop.py` does that
+with the standard library only (Pillow is not installed here).
+
+`BrandWordmark.vue` takes a `height` and a `variant`. Width and `aspect-ratio`
+are derived from the artwork's intrinsic 1153×187, so the lockup can never be
+stretched and its box is reserved before the image loads. The `src` is bound
+rather than literal — Vite resolves literal template `src` values at build
+time, which would tie the build to files the owner supplies. If a file is
+missing the component falls back to the name set in DM Sans, so a missing asset
+degrades to a plain wordmark rather than a broken-image icon.
+
+The lockup is 6.2:1. Below roughly 30px tall the "CARWASH" line stops being
+readable, so header/footer/band heights are set at 38/32/34 with a 30px floor
+on small screens.
+
+### Favicons
 
 | File | Used by |
 |---|---|
 | `favicon.ico` | Browser tabs and bookmarks; contains 16, 32 and 48px |
-| `favicon-32.png` | Browsers that prefer a PNG favicon; also the small manifest icon |
-| `apple-touch-icon.png` | iOS home screen and the manifest, 180×180, full-bleed |
+| `favicon-32.png` | Browsers that prefer a PNG favicon; small manifest icon |
+| `apple-touch-icon.png` | iOS home screen and the manifest, 180×180 |
 | `site.webmanifest` | Name, theme colour and icon set for "Add to home screen" |
 
-The sizes are optically tuned rather than uniform: 16px uses a larger glyph
-(0.70 of the box) and a tighter radius (0.22) because at that size the rounded
-corners eat pixels the digits need. 32 and 48 use 0.64 and 0.26. They are
-rendered straight at target size — downscaling from a supersampled canvas
-blurred the two digits into each other at 16px.
+`favicon.ico` and `favicon-32.png` are generated from `logo-mark.png` by
+`scratchpad/mkicons.py` — area-average downscaling plus an ICO container with
+PNG payloads, again standard library only. Rerun it whenever the mark changes:
 
-### Regenerating the icons
+```bash
+python scratchpad/mkicons.py
+```
 
-There is no build step for these; they were produced by drawing to a canvas in
-the browser with DM Sans loaded, then assembling the `.ico` (which may hold PNG
-payloads) from the 16/32/48 renders. Redo that if the mark, the font or the
-navy ever changes.
+They are rasters on purpose: nothing outside the page loads a webfont, so a
+logo containing text has to be baked into pixels rather than left as live text
+in an SVG.
 
 ## The hero photo
 
@@ -261,5 +309,6 @@ in `public/` and pass it through:
 ```vue
 <ImageSlot src="/hero.jpg" alt="Washing a car by hand in a Midrand driveway" />
 ```
-#   c l a n 2 2 - c a r w a s h  
+#   c l a n 2 2 - c a r w a s h 
+ 
  

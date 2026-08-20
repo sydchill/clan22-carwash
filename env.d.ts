@@ -5,6 +5,8 @@ interface ImportMetaEnv {
   readonly VITE_WHATSAPP_NUMBER: string
   /** Web3Forms access key. Empty falls back to the WhatsApp handoff. */
   readonly VITE_WEB3FORMS_ACCESS_KEY: string
+  /** hCaptcha site key. Empty disables the spam check. */
+  readonly VITE_HCAPTCHA_SITEKEY: string
 }
 
 interface ImportMeta {
